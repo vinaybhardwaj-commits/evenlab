@@ -2,7 +2,9 @@
 
 Daily/monthly laboratory TAT dashboard for the Even Hospital Lab Director, deployed at **lab.evenos.app**. See the PRD (`Lab-Dashboard-PRD.md`) for the full design.
 
-This commit contains **Phase-0 / ingestion engine**: parsing KareXpert CSV exports, de-duplication, TAT & pathway-stage computation, and the Postgres upsert + schema. The Next.js UI, artifact generation, and Vertex AI come in later phases.
+**Status:** Phase 0 + daily MVP foundation. Includes the ingestion engine (parse, dedup, TAT/stage metrics, Postgres upsert + schema), single-user auth (email + password), the upload flow (validate → commit), and the daily dashboard UI (KPIs, delayed-rate & status charts, leaderboards). Artifact generation (PDF/PNG/HTML), the calendar/monthly archive, and Vertex AI come next.
+
+Verified: `next build` clean (13 routes); auth + route protection + login smoke-tested; upload preview returns the correct validation summary for the real sample export.
 
 ## Stack
 
@@ -32,11 +34,20 @@ scripts/ingest-cli.ts      run ingestion against a local CSV
 
 ```bash
 npm install
-# parse-only summary (no DB needed):
-npm run ingest -- /path/to/lab_service_tat_report.csv
-# also upsert into Postgres (set DATABASE_URL first):
-npm run ingest -- /path/to/file.csv --db
+
+# the web app (needs SESSION_SECRET, AUTH_EMAIL, AUTH_PASSWORD_HASH in .env.local):
+npm run dev            # http://localhost:3000
+npm run build          # production build
+
+# ingestion CLI (no app needed):
+npm run ingest -- /path/to/lab_service_tat_report.csv      # parse-only summary
+npm run ingest -- /path/to/file.csv --db                   # also upsert (needs DATABASE_URL)
 npm run typecheck
+```
+
+Generate the password hash for `AUTH_PASSWORD_HASH`:
+```bash
+node -e "console.log(require('bcryptjs').hashSync(process.argv[1],12))" 'your-password'
 ```
 
 ## Database setup
