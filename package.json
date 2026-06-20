@@ -1,0 +1,21 @@
+{
+  "name": "evenlab",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "description": "Even Lab Operations Dashboard (lab.evenos.app) — ingestion engine",
+  "scripts": {
+    "ingest": "tsx scripts/ingest-cli.ts",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "csv-parse": "^5.5.6",
+    "pg": "^8.12.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.14.10",
+    "@types/pg": "^8.11.6",
+    "tsx": "^4.16.2",
+    "typescript": "^5.5.3"
+  }
+}
