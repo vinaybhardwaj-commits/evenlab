@@ -111,11 +111,11 @@ export default function TodayView({ data, selectedDate }: { data: Data; selected
 
       <div className="card">
         <h3>Downloads</h3>
-        <p className="hint">Auto-generated report, image and interactive view arrive in the next phase.</p>
+        <p className="hint">Generated on demand and saved. Exports show UHID only — never patient names.</p>
         <div className="downloads">
-          <div className="dl"><div><div className="t">PDF report</div><div className="s">coming soon</div></div></div>
-          <div className="dl"><div><div className="t">Shareable image</div><div className="s">coming soon</div></div></div>
-          <div className="dl"><div><div className="t">Interactive view</div><div className="s">coming soon</div></div></div>
+          <a className="dl" href={`/api/report/daily/${data.date}/pdf`}><div><div className="t">PDF report</div><div className="s">download .pdf</div></div></a>
+          <a className="dl" href={`/api/report/daily/${data.date}/png`}><div><div className="t">Shareable image</div><div className="s">download .png</div></div></a>
+          <a className="dl" href={`/api/report/daily/${data.date}/html`} target="_blank" rel="noopener noreferrer"><div><div className="t">Interactive view</div><div className="s">open .html</div></div></a>
         </div>
       </div>
 

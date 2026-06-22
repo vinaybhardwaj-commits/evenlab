@@ -68,7 +68,8 @@ export default function MonthlyView({ data, months }: { data: Data; months: Mont
             onChange={(e) => router.push(`/monthly?month=${e.target.value}`)}>
             {months.map((m) => <option key={m.month} value={m.month}>{prettyMonth(m.month)} ({m.count})</option>)}
           </select>
-          <button className="btn sm" disabled title="Coming in the next phase">Download deck</button>
+          <a className="btn ghost sm" href={`/api/report/monthly/${data.month}/pdf`}>PDF</a>
+          <a className="btn sm" href={`/api/report/monthly/${data.month}/pptx`}>Download deck</a>
         </div>
       </div>
 

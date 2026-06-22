@@ -2,8 +2,9 @@
 const nextConfig = {
   reactStrictMode: true,
   experimental: {
-    // pg is a Node-only dependency; keep it external to the server bundle (Next 14)
-    serverComponentsExternalPackages: ["pg"],
+    // Node-only deps with native binaries / data files — keep external so they
+    // load from node_modules at runtime instead of being bundled (Next 14).
+    serverComponentsExternalPackages: ["pg", "pdfkit", "@resvg/resvg-js", "pptxgenjs"],
   },
 };
 
