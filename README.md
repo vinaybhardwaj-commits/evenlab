@@ -8,10 +8,9 @@ Verified: `next build` clean (13 routes); auth + route protection + login smoke-
 
 ## Stack
 
-- Next.js 14 on Vercel (functions pinned to `bom1` / Mumbai) — UI in a later phase
-- GCP Cloud SQL for PostgreSQL, `asia-south1` (Mumbai) — full India data residency
-- Google Cloud Storage, `asia-south1` — raw CSVs + generated reports
-- Vertex AI (Gemini) — monthly synthesis, daily insight, trend/forecast (de-identified inputs only)
+- Next.js 14 on Vercel (functions pinned to `bom1` / Mumbai)
+- Neon Postgres — stores **everything**: structured data *and* files (raw CSVs + generated reports/images/decks as blobs in the `files` table). Closest region is Singapore (no India region on Neon); residency accepted under DPDP's negative-list model.
+- Vertex AI (Gemini) — monthly synthesis, daily insight, trend/forecast (de-identified inputs only; org GCP is used for Gemini, not storage)
 
 ## Layout
 
@@ -28,7 +27,7 @@ scripts/ingest-cli.ts      run ingestion against a local CSV
 - **Report date:** order/booking date, bucketed in IST.
 - **TAT 1** = collection → result entry; **TAT 2** = result entry → verification. Computed in minutes; in the DB these and `report_date` are GENERATED columns, so they recompute when timestamps fill in.
 - **Delay:** KareXpert `Critical` segment flag (stored in `kx_status_json`).
-- **PHI:** addresses are never read/stored; `patient_name` is kept (India-resident DB) but never written to exports.
+- **PHI:** addresses are never read/stored; `patient_name` is kept but never written to exports or sent to the LLM.
 
 ## Run it
 
@@ -65,5 +64,5 @@ The single dashboard login (Lab Director) is configured via `AUTH_EMAIL` + `AUTH
 ## Security
 
 - Secrets live only in env / secret manager — never in the repo or DB.
-- All patient data stays in India (Mumbai region) end to end.
+- Data + files reside in Neon (Singapore); only de-identified aggregates ever leave for Gemini. Residency accepted under DPDP's negative-list model.
 - Audit log records uploads, downloads, name reveals and logins.

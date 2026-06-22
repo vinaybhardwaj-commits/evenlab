@@ -41,6 +41,13 @@ export async function POST(req: Request) {
 
     const { inserted, updated } = await upsertTests(pool, records, uploadId);
 
+    // keep the raw upload (decision: keep everything) — stored as a blob in Neon
+    await pool.query(
+      `INSERT INTO files (kind, filename, mime, bytes, size_bytes, upload_id)
+       VALUES ('raw_csv', $1, 'text/csv', $2, $3, $4)`,
+      [file.name, buf, buf.length, uploadId],
+    );
+
     await pool.query(
       `UPDATE uploads SET new_count=$2, updated_count=$3, duplicate_count=$4, dropped_count=$5 WHERE id=$1`,
       [uploadId, inserted, updated, summary.duplicatesMerged, summary.droppedNoId],

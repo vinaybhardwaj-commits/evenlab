@@ -1,5 +1,5 @@
--- Even Lab Dashboard — database schema (PostgreSQL / Cloud SQL, asia-south1)
--- Run once to initialise. Safe to re-run (IF NOT EXISTS).
+-- Even Lab Dashboard — database schema (Neon Postgres)
+-- All data AND files (blobs) live here. Run once to initialise; safe to re-run.
 
 -- ============================================================
 -- uploads: one row per uploaded CSV file
@@ -104,6 +104,26 @@ CREATE TABLE IF NOT EXISTS monthly_summaries (
   kpis_json    JSONB,
   mom_deltas_json JSONB
 );
+
+-- ============================================================
+-- files: all stored blobs live in the database (raw CSVs + generated
+-- reports/images/decks). Served via an authenticated /api/files/:id route.
+-- ============================================================
+CREATE TABLE IF NOT EXISTS files (
+  id          BIGSERIAL PRIMARY KEY,
+  kind        TEXT NOT NULL,            -- raw_csv | daily_pdf | daily_png | daily_html | monthly_pptx
+  filename    TEXT NOT NULL,
+  mime        TEXT NOT NULL,
+  bytes       BYTEA NOT NULL,
+  size_bytes  INTEGER,
+  upload_id   BIGINT REFERENCES uploads(id),
+  report_date DATE,
+  month       DATE,
+  created_at  TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+CREATE INDEX IF NOT EXISTS files_report_date_idx ON files (report_date);
+CREATE INDEX IF NOT EXISTS files_month_idx ON files (month);
+CREATE INDEX IF NOT EXISTS files_kind_idx ON files (kind);
 
 -- ============================================================
 -- audit_log: uploads, downloads, name reveals, logins

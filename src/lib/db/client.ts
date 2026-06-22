@@ -1,6 +1,6 @@
-// Even Lab — Postgres connection (Cloud SQL, asia-south1).
-// Dev / public-IP+SSL: use DATABASE_URL.
-// Prod on Vercel: prefer the Cloud SQL connector with IAM auth (see README).
+// Even Lab — Postgres connection (Neon).
+// Set DATABASE_URL to Neon's POOLED connection string (the "-pooler" host with
+// ?sslmode=require) — recommended for Vercel serverless functions.
 import { Pool } from "pg";
 
 let pool: Pool | null = null;
