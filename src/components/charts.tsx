@@ -1,12 +1,13 @@
 "use client";
-import { Bar } from "react-chartjs-2";
+import { Bar, Line } from "react-chartjs-2";
 import {
-  Chart as ChartJS, BarElement, CategoryScale, LinearScale, Tooltip, Legend,
+  Chart as ChartJS, BarElement, LineElement, PointElement,
+  CategoryScale, LinearScale, Tooltip, Legend,
 } from "chart.js";
 
-ChartJS.register(BarElement, CategoryScale, LinearScale, Tooltip, Legend);
+ChartJS.register(BarElement, LineElement, PointElement, CategoryScale, LinearScale, Tooltip, Legend);
 
-const NAVY = "#1F3864", BLUE = "#2E75B6", GREEN = "#548235", AMBER = "#BF8F00", RED = "#C00000";
+const NAVY = "#1F3864", BLUE = "#2E75B6", LBLUE = "#9DC3E6", GREEN = "#548235", AMBER = "#BF8F00", RED = "#C00000";
 
 export function DelayRateChart({
   labels, tat1, tat2,
@@ -51,6 +52,40 @@ export function StatusMixChart({
         plugins: {
           legend: { position: "top", labels: { boxWidth: 12, font: { size: 11 } } },
           tooltip: { callbacks: { label: (c) => `${c.dataset.label}: ${Math.round(Number(c.raw))}%` } },
+        },
+      }}
+    />
+  );
+}
+
+// Within-month daily trend: test volume (bars-as-area via fill line) + TAT1 delayed % (line), dual axis.
+export function TrendChart({
+  labels, volume, delayedPct,
+}: { labels: string[]; volume: number[]; delayedPct: (number | null)[] }) {
+  return (
+    <Line
+      data={{
+        labels,
+        datasets: [
+          { label: "Tests/day", data: volume, borderColor: LBLUE, backgroundColor: "rgba(157,195,230,0.25)",
+            yAxisID: "yVol", fill: true, tension: 0.3, pointRadius: 2 },
+          { label: "TAT 1 delayed %", data: delayedPct as number[], borderColor: RED, backgroundColor: RED,
+            yAxisID: "yPct", tension: 0.3, pointRadius: 2, borderDash: [5, 3] },
+        ],
+      }}
+      options={{
+        responsive: true, maintainAspectRatio: false,
+        interaction: { mode: "index", intersect: false },
+        scales: {
+          yVol: { type: "linear", position: "left", beginAtZero: true, title: { display: true, text: "tests" } },
+          yPct: { type: "linear", position: "right", beginAtZero: true, max: 100,
+            grid: { drawOnChartArea: false }, ticks: { callback: (v) => `${v}%` }, title: { display: true, text: "% delayed" } },
+          x: { ticks: { maxRotation: 0, autoSkip: true, maxTicksLimit: 12 } },
+        },
+        plugins: {
+          legend: { position: "top", labels: { boxWidth: 12, font: { size: 11 } } },
+          tooltip: { callbacks: { label: (c) => c.dataset.label === "TAT 1 delayed %"
+            ? `delayed: ${c.raw == null ? "–" : c.raw + "%"}` : `tests: ${c.raw}` } },
         },
       }}
     />

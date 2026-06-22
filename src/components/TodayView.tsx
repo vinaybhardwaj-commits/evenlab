@@ -18,8 +18,9 @@ function prettyDate(d: string | null): string {
   return new Date(d + "T00:00:00").toLocaleDateString("en-GB", { weekday: "long", day: "numeric", month: "long", year: "numeric" });
 }
 
-export default function TodayView({ data }: { data: Data }) {
+export default function TodayView({ data, selectedDate }: { data: Data; selectedDate?: string | null }) {
   const [showUpload, setShowUpload] = useState(false);
+  const isHistorical = !!selectedDate;
   const UploadBtn = (
     <button className="btn" onClick={() => setShowUpload(true)}>Upload today&rsquo;s CSV</button>
   );
@@ -84,8 +85,11 @@ export default function TodayView({ data }: { data: Data }) {
     <>
       <div className="pagehead">
         <div>
-          <h1>Today · {prettyDate(data.date)}</h1>
-          <div className="sub">{k.tests} tests in this batch</div>
+          <h1>{isHistorical ? prettyDate(data.date) : `Today · ${prettyDate(data.date)}`}</h1>
+          <div className="sub">
+            {k.tests} tests{isHistorical ? " · " : " in this batch"}
+            {isHistorical && <a className="link" href="/today">← back to latest</a>}
+          </div>
         </div>
         {UploadBtn}
       </div>
