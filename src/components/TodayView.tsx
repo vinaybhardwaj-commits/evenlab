@@ -3,6 +3,7 @@ import { useState } from "react";
 import type { DailyDashboard } from "@/lib/metrics/daily";
 import { DelayRateChart, StatusMixChart } from "./charts";
 import UploadModal from "./UploadModal";
+import InsightCard from "./InsightCard";
 
 type Data = DailyDashboard | { error: string };
 
@@ -18,7 +19,7 @@ function prettyDate(d: string | null): string {
   return new Date(d + "T00:00:00").toLocaleDateString("en-GB", { weekday: "long", day: "numeric", month: "long", year: "numeric" });
 }
 
-export default function TodayView({ data, selectedDate }: { data: Data; selectedDate?: string | null }) {
+export default function TodayView({ data, selectedDate, insight }: { data: Data; selectedDate?: string | null; insight?: string | null }) {
   const [showUpload, setShowUpload] = useState(false);
   const isHistorical = !!selectedDate;
   const UploadBtn = (
@@ -108,6 +109,8 @@ export default function TodayView({ data, selectedDate }: { data: Data; selected
           <div className="val">{t2p == null ? "–" : `${t2p}%`}</div>
           <div className="trend">{delta(t2p, pt2, "pct") ?? `${k.t2_crit} of ${k.t2_flag}`}</div></div>
       </div>
+
+      <InsightCard scope="daily" dkey={data.date} initial={insight ?? null} />
 
       <div className="card">
         <h3>Downloads</h3>

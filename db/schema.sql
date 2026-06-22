@@ -126,6 +126,20 @@ CREATE INDEX IF NOT EXISTS files_month_idx ON files (month);
 CREATE INDEX IF NOT EXISTS files_kind_idx ON files (kind);
 
 -- ============================================================
+-- ai_insights: cached Vertex Gemini text (daily insight / monthly narrative).
+-- Generated from DE-IDENTIFIED aggregates only — never patient data.
+-- ============================================================
+CREATE TABLE IF NOT EXISTS ai_insights (
+  id         BIGSERIAL PRIMARY KEY,
+  scope      TEXT NOT NULL,           -- day | month
+  key        TEXT NOT NULL,           -- YYYY-MM-DD or YYYY-MM
+  text       TEXT NOT NULL,
+  model      TEXT,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  UNIQUE (scope, key)
+);
+
+-- ============================================================
 -- audit_log: uploads, downloads, name reveals, logins
 -- ============================================================
 CREATE TABLE IF NOT EXISTS audit_log (

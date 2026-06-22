@@ -3,6 +3,7 @@ import { useRouter } from "next/navigation";
 import type { MonthlyDashboard } from "@/lib/metrics/monthly";
 import type { MonthCount } from "@/lib/metrics/calendar";
 import { DelayRateChart, StatusMixChart, TrendChart } from "./charts";
+import InsightCard from "./InsightCard";
 
 type Data = MonthlyDashboard | { error: string };
 
@@ -16,7 +17,7 @@ const pct = (a: number, b: number) => (b ? Math.round((a / b) * 100) : null);
 const sevClass = (p: number | null) => (p == null ? "" : p >= 50 ? "red" : p >= 30 ? "amber" : "green");
 function prettyMonth(mm: string): string { const [y, m] = mm.split("-").map(Number); return `${MONTHS[m - 1]} ${y}`; }
 
-export default function MonthlyView({ data, months }: { data: Data; months: MonthCount[] }) {
+export default function MonthlyView({ data, months, insight }: { data: Data; months: MonthCount[]; insight?: string | null }) {
   const router = useRouter();
 
   if ("error" in data) {
@@ -80,6 +81,8 @@ export default function MonthlyView({ data, months }: { data: Data; months: Mont
         <div className={`kpi ${sevClass(t1p)}`}><div className="lab">TAT 1 delayed</div><div className="val">{t1p == null ? "–" : `${t1p}%`}</div><div className="trend">{delta(t1p, pt1, "pct") ?? `${k.t1_crit} of ${k.t1_flag}`}</div></div>
         <div className={`kpi ${sevClass(t2p)}`}><div className="lab">TAT 2 delayed</div><div className="val">{t2p == null ? "–" : `${t2p}%`}</div><div className="trend">{delta(t2p, pt2, "pct") ?? `${k.t2_crit} of ${k.t2_flag}`}</div></div>
       </div>
+
+      <InsightCard scope="monthly" dkey={data.month} initial={insight ?? null} />
 
       <div className="card">
         <h3>Through the month — volume &amp; delayed rate</h3>
